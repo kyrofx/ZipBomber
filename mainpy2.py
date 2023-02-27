@@ -74,8 +74,12 @@ def makeBomb(levels, fileName):
 level = str(input('level: the more the merrier'))
 print('\n')
 name = str(input('desired file name-EX: [name].zip'))
-if ('%f[') % (name.split("."))
-makeBomb(level, name)
+t1 = name.split(".")
+t2 = len(t1)
+if (t2 == 1):
+    name = name + ".zip"
+    print("\n you did not enter a .zip file, so we added it for you\n")
+makeBomb(int(level), name)
 
 # if __name__ == '__main__':
 #	if len(sys.argv) < 3:
