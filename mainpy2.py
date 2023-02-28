@@ -48,6 +48,7 @@ def makeBomb(levels, fileName):
     dummy_name = 'cache.txt'
     start_time = time.time()
     # Start
+    print('making "cache" file...\n')
     makeTempFile(dummy_name, 1)
     level_1_zip = '1.zip'
     print('compressing...\n')
@@ -73,7 +74,7 @@ def makeBomb(levels, fileName):
 
 level = str(input('level: the more the merrier'))
 print('\n')
-name = str(input('desired file name-EX: [name].zip'))
+name = str(input('desired file name-EX: [name].zip\n'))
 t1 = name.split(".")
 t2 = len(t1)
 if (t2 == 1):
