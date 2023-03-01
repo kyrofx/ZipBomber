@@ -12,7 +12,7 @@ def fileSize(filename):
 
 def makeTempFile(filename):
     with open(filename, 'wb') as cache:
-        for i in range(1):
+        for i in range(204):
             chunk = bytearray(1048576 * b'0')
             cache.write(chunk)
 
