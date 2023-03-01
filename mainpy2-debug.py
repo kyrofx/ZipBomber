@@ -2,7 +2,6 @@ import zipfile
 import shutil
 import os
 import time
-import lz4.frame
 
 # important integers and vars
 fileSizeExt = 0
@@ -28,17 +27,17 @@ def fileExt(name):
     return name[name.rfind('.') + 1:]
 
 
-def compressFile(infile, outfile):
-    with open(infile, "rb") as f_in:
-        with open(outfile, "wb") as f_out:
-            compressor = lz4.frame.LZ4F_compressFrame
-            block_size = 1024 * 1024
-            while True:
-                data = f_in.read(block_size)
-                if not data:
-                    break
-                compressed_data = compressor(data)
-                f_out.write(compressed_data)
+# def compressFile(infile, outfile):
+#   with open(infile, "rb") as f_in:
+#      with open(outfile, "wb") as f_out:
+#         compressor = lz4.frame.LZ4F_compressFrame
+#        block_size = 1024 * 1024
+#       while True:
+#          data = f_in.read(block_size)
+#         if not data:
+#            break
+#       compressed_data = compressor(data)
+#      f_out.write(compressed_data)
 
 
 def compressFileOld(infile, outfile):
@@ -55,6 +54,7 @@ def copyandcompress(infile, outfile, n_copies):
         zf.write(f_name, compress_type=zipfile.ZIP_DEFLATED)
         os.remove(f_name)
     zf.close()
+
 
 def extractZipFiles():
     for file in os.listdir(os.getcwd()):
@@ -81,9 +81,7 @@ def extractZipFiles():
             print('going for a second round')
             extractZipFiles()
     else:
-        return()
-
-
+        return ()
 
 
 def makeBomb(levels, fileName):
@@ -122,13 +120,14 @@ def makeBomb(levels, fileName):
     print('Size After Decompression: %d GB' % decompressed_size)
     print('Generation Time: %.2fs' % (end_time - start_time))
     fileSizeExt = decompressed_size
-    return out_zip_file
+    return out_zip_file, decompressed_size
 
 
-#main options
+# main options
 option1 = str(input('1. make bomb only? 2. extract bomb only? 3. do both? (1/2/3)\n'))
-
-if(option1 == '1'):
+placeholer = 'f'
+ds = 1
+if (option1 == '1'):
     level = str(input('level: \n'))
     print('\n')
     name = str(input('desired file name-EX: [name].zip\n'))
@@ -138,13 +137,13 @@ if(option1 == '1'):
         name = name + ".zip"
         print("\nyou did not enter a .zip file, so we added it for you\n")
 
-    makeBomb(int(level), name)
+    placeholder, ds = makeBomb(int(level), name)
 
-if(option1 == '2'):
+if (option1 == '2'):
     extractZipFiles()
     print('done')
 
-if(option1 == '3'):
+if (option1 == '3'):
     level = str(input('level: \n'))
     print('\n')
     name = str(input('desired file name-EX: [name].zip\n'))
@@ -155,7 +154,8 @@ if(option1 == '3'):
         print("\nyou did not enter a .zip file, so we added it for you\n")
 
     makeBomb(int(level), name)
-    extract = str(input('Extract all files? This will take a while. Estimated file size: ' + str(fileSizeExt) + 'GB (Y/n)\n'))
+    extract = str(
+        input('\n \nExtract all files? This will take a while. Estimated file size: ' + str(ds) + 'GB (Y/n)\n'))
 
     if (extract == 'Y'):
         extractZipFiles()
